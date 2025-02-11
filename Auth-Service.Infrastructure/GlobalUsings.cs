@@ -1,0 +1,11 @@
+﻿global using System.IdentityModel.Tokens.Jwt;
+global using System.Security.Claims;
+global using System.Security.Cryptography;
+global using Auth_Service.Application.Interfaces.Authentication;
+global using Auth_Service.Domain.Entities;
+global using Auth_Service.Infrastructure.Utils;
+global using Microsoft.IdentityModel.Tokens;
+global using Auth_Service.Application.Interfaces.Hashing;
+global using System.Collections.Generic;
+global using Auth_Service.Application.DTOs.Output.Token;
+global using Auth_Service.Domain.Interfaces.Transaction;

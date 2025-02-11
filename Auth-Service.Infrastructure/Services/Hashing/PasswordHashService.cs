@@ -1,8 +1,4 @@
-﻿using System.Security.Cryptography;
-using Auth_Service.Domain.Interfaces;
-using Auth_Service.Domain.Interfaces.Hashing;
-
-namespace Auth_Service.Infrastructure.Services.Hashing;
+﻿namespace Auth_Service.Infrastructure.Services.Hashing;
 
 public class PasswordHashService : IPasswordHashService
 {
@@ -23,7 +19,7 @@ public class PasswordHashService : IPasswordHashService
     {
         var parts = passwordHash.Split('-');
 
-        if (parts.Length != 2) 
+        if (parts.Length != 2)
             throw new Exception("Algo deu errado ao processar sua solicitação. Tente novamente mais tarde.");
 
         var hash = Convert.FromBase64String(parts[0]);

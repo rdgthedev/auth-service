@@ -1,4 +1,4 @@
-﻿namespace Auth_Service.Domain.Interfaces.Hashing;
+﻿namespace Auth_Service.Application.Interfaces.Hashing;
 
 public interface IPasswordHashService
 {
