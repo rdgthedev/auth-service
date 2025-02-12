@@ -26,7 +26,7 @@ public class AuthService : IAuthService
         token.Revoke();
 
         await _unitOfWork.RefreshTokens.DeleteAsync(token, cancellationToken);
-        await _unitOfWork.CommitAsync();
+        await _unitOfWork.CommitAsync(cancellationToken);
     }
 
     public async Task<TokenOutputDTO> LoginAsync(

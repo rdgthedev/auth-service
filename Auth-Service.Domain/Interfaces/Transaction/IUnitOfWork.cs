@@ -6,6 +6,6 @@ public interface IUnitOfWork
 {
     public IUserRepository Users { get; }
     public IRoleRepository Roles { get; }
-    public IRefreshTokenRepository RefreshTokens { get; set; }
-    Task CommitAsync();
+    public IRefreshTokenRepository RefreshTokens { get; }
+    Task CommitAsync(CancellationToken cancellationToken);
 }
