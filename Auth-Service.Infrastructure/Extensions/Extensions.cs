@@ -1,5 +1,3 @@
-using Auth_Service.Domain.Interfaces.Repositories;
-using Auth_Service.Infrastructure.Data.Context;
 using Auth_Service.Infrastructure.Repositories;
 using Auth_Service.Infrastructure.Services.Authentication;
 using Microsoft.EntityFrameworkCore;
@@ -43,6 +41,12 @@ public static class Extensions
     public static IServiceCollection AddUnitOfWork(this IServiceCollection services)
     {
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+        return services;
+    }
+
+    public static IServiceCollection LoadJwtSettings(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
         return services;
     }
 }

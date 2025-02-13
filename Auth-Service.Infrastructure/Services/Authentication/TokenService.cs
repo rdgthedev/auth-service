@@ -1,34 +1,31 @@
-﻿namespace Auth_Service.Infrastructure.Services.Authentication;
+﻿using Microsoft.Extensions.Options;
 
-public class TokenService : ITokenService, IDisposable
+namespace Auth_Service.Infrastructure.Services.Authentication;
+
+public class TokenService(IOptions<JwtSettings> options) : ITokenService
 {
-    private const string _privateKey = "";
-    private readonly RSA _rsaKey;
-
-    public TokenService()
-        => _rsaKey = RSAKey.Load(_privateKey);
+    private readonly JwtSettings _options = options.Value;
 
     public string GenerateAccessToken(User user)
     {
+        using var privateKey = RSAKey.Load(_options.PrivateKey);
+
         var credentials = new SigningCredentials(
-            new RsaSecurityKey(_rsaKey),
+            new RsaSecurityKey(privateKey),
             SecurityAlgorithms.RsaSha256);
 
         var claims = GenerateClaims(user);
 
         var token = new JwtSecurityToken(
-            issuer: "Auth-Service",
-            expires: DateTime.Now.AddMinutes(15),
+            issuer: _options.Issuer,
+            expires: DateTime.Now.AddMinutes(_options.ExpirationTimeInMinutes),
             claims: claims,
             signingCredentials: credentials);
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
-    public string GenerateRefreshToken()
-    {
-        return Guid.NewGuid().ToString();
-    }
+    public string GenerateRefreshToken() => Guid.NewGuid().ToString();
 
     public async Task<bool> ValidateAccessToken(string token)
     {
@@ -56,20 +53,17 @@ public class TokenService : ITokenService, IDisposable
 
     private TokenValidationParameters GetTokenValidationParameters()
     {
+        using var publicKey = RSAKey.Load(_options.PublicKey);
+
         return new TokenValidationParameters
         {
             ValidateIssuer = true,
             ValidateLifetime = true,
             ValidateAudience = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuer = "Auth-Service",
-            ValidAudiences = new List<string>(),
-            IssuerSigningKey = new RsaSecurityKey(_rsaKey)
+            ValidIssuer = _options.Issuer,
+            ValidAudiences = _options.Audiences,
+            IssuerSigningKey = new RsaSecurityKey(publicKey)
         };
-    }
-
-    public void Dispose()
-    {
-        _rsaKey.Dispose();
     }
 }

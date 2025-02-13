@@ -9,6 +9,7 @@ public class RefreshToken : Entity
     private bool IsRevoked { get; set; }
     public bool IsValid => Validate();
     public Guid UserId { get; set; }
+    public User User { get; set; }
 
     public RefreshToken(
         string token,

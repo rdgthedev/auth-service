@@ -5,6 +5,8 @@ namespace Auth_Service.Domain.Entities;
 public class Role : Entity
 {
     public string Name { get; set; }
+    public Guid UserId { get; set; }
+    public List<User> User { get; set; }
 
     public Role(string name)
     {

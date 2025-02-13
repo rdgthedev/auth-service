@@ -1,32 +1,22 @@
 ﻿namespace Auth_Service.Infrastructure.Services.Authentication;
 
-public class AuthService : IAuthService
+public class AuthService(
+    IUnitOfWork unitOfWork,
+    IPasswordHashService passwordHashService,
+    ITokenService tokenService)
+    : IAuthService
 {
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly IPasswordHashService _passwordHashService;
-    private readonly ITokenService _tokenService;
-
-    public AuthService(
-        IUnitOfWork unitOfWork,
-        IPasswordHashService passwordHashService,
-        ITokenService tokenService)
-    {
-        _unitOfWork = unitOfWork;
-        _passwordHashService = passwordHashService;
-        _tokenService = tokenService;
-    }
-
     public async Task LogoutAsync(string refreshToken, CancellationToken cancellationToken)
     {
-        var token = await _unitOfWork.RefreshTokens.GetByRefreshTokenValue(refreshToken, cancellationToken);
+        var token = await unitOfWork.RefreshTokens.GetByRefreshTokenValue(refreshToken, cancellationToken);
 
         if (token is null)
             throw new Exception("Ocorreu um erro. Não foi possível encontrar o refresh token na base de dados!");
 
         token.Revoke();
 
-        await _unitOfWork.RefreshTokens.DeleteAsync(token, cancellationToken);
-        await _unitOfWork.CommitAsync(cancellationToken);
+        await unitOfWork.RefreshTokens.DeleteAsync(token, cancellationToken);
+        await unitOfWork.CommitAsync(cancellationToken);
     }
 
     public async Task<TokenOutputDTO> LoginAsync(
@@ -34,18 +24,18 @@ public class AuthService : IAuthService
         string password,
         CancellationToken cancellationToken)
     {
-        var user = await _unitOfWork.Users.GetByEmail(email, cancellationToken);
+        var user = await unitOfWork.Users.GetByEmail(email, cancellationToken);
 
         if (user is null)
             throw new Exception();
 
-        var isValid = _passwordHashService.Verify(password, user.Password);
+        var isValid = passwordHashService.Verify(password, user.PasswordHash);
 
         if (!isValid)
             throw new Exception();
 
-        var accessToken = _tokenService.GenerateAccessToken(user);
-        var refreshToken = _tokenService.GenerateRefreshToken();
+        var accessToken = tokenService.GenerateAccessToken(user);
+        var refreshToken = tokenService.GenerateRefreshToken();
 
         return TokenOutputDTO.GenerateResult(accessToken, refreshToken);
     }

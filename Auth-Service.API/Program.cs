@@ -1,3 +1,4 @@
+using Auth_Service.Infrastructure;
 using Auth_Service.Infrastructure.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,6 +10,7 @@ builder.Services
     .AddDbContextConfigurations(builder.Configuration)
     .AddRepositories()
     .AddUnitOfWork()
+    .LoadJwtSettings(builder.Configuration)
     .AddTokenService()
     .AddAuthService();
 
